@@ -8,10 +8,10 @@
 
 // Which pin on the Arduino is connected to the NeoPixels?
 // On a Trinket or Gemma we suggest changing this to 1
-#define PIN            8
+#define PIN 8
 
 // How many NeoPixels are attached to the Arduino?
-#define NUMPIXELS      64
+#define NUMPIXELS 64
 #define NUMMATRIZ_X 8
 #define NUMMATRIZ_Y 8
 
@@ -53,7 +53,7 @@ void loop() {
         if ((circundantes < 2) || (circundantes > 3)) {
           universo_siguiente[x][y] = 0;
           pixels.setPixelColor(num_led (x, y), pixels.Color(0, 0, 0));
-          Serial.print("Mueren la celda: ");
+          Serial.print("Muere la celda: ");
           Serial.print(x);
           Serial.print(" , ");
           Serial.println(y);
@@ -88,6 +88,12 @@ int cacular_circundantes (int x, int y) {
   int num_circundantes = 0;
   for (int i = x - 1; i <= x + 1; i++) {
     for (int j = y - 1; j <= y + 1; j++) {
+      if ((i == x) && (j == y)) {
+        continue;
+      }
+      if ((i < 0) || (i >= NUMMATRIZ_X) || (j < 0) || (j >= NUMMATRIZ_Y)) {
+        continue;
+      }
       num_circundantes += universo[i][j];
     }
   }
@@ -98,19 +104,27 @@ void inicializa_universo() {  //inicializa el universo tal y como quieres que em
   Serial.println("Inicializado");
   for (int x = 0; x < NUMMATRIZ_X; x++) {
     for (int y = 0; y < NUMMATRIZ_Y; y++) {
-      if (x > 3) {
-        universo[x][y] = 1;
-        universo_siguiente[x][y] = 1;
-        pixels.setPixelColor(num_led (x, y), pixels.Color(25, 0, 0));
-      }
-      else {
-        universo[x][y] = 0;
-        universo_siguiente[x][y] = 0;
-        pixels.setPixelColor(num_led (x, y), pixels.Color(0, 0, 0));
-      }
-      pixels.show(); // This sends the updated pixel color to the hardware.
+      universo[x][y] = 0;
+      universo_siguiente[x][y] = 0;
+      pixels.setPixelColor(num_led (x, y), pixels.Color(0, 0, 0));
     }
   }
+  universo[4][2] = 1;
+  universo_siguiente[4][2] = 1;
+  pixels.setPixelColor(num_led (4, 2), pixels.Color(25, 0, 0));
+  universo[4][3] = 1;
+  universo_siguiente[4][3] = 1;
+  pixels.setPixelColor(num_led (4, 3), pixels.Color(25, 0, 0));
+  universo[4][4] = 1;
+  universo_siguiente[4][4] = 1;
+  pixels.setPixelColor(num_led (4, 4), pixels.Color(25, 0, 0));
+  universo[4][5] = 1;
+  universo_siguiente[4][5] = 1;
+  pixels.setPixelColor(num_led (4, 5), pixels.Color(25, 0, 0));
+  universo[3][4] = 1;
+  universo_siguiente[5][2] = 1;
+  pixels.setPixelColor(num_led (5, 2), pixels.Color(25, 0, 0));
+  pixels.show(); // This sends the updated pixel color to the hardware.
 }
 
 void actualiza_universo() {
