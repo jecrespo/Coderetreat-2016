@@ -22,10 +22,14 @@ Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ80
 
 int delayval = 1000; // delay
 boolean universo [8][8];  //leds encendidos y apagados
+boolean universo_siguiente [8][8];  //leds encendidos y apagados
 int num_iteracion = 0;
 
 void setup() {
   Serial.begin(9600);
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
   Serial.println("Coderetreat-2016");
   Serial.println("Juego de la vida");
   Serial.println("-----------------");
@@ -47,7 +51,7 @@ void loop() {
       int circundantes = cacular_circundantes(x, y);
       if (universo[x][y] == 1) {
         if ((circundantes < 2) || (circundantes > 3)) {
-          universo[x][y] = 0;
+          universo_siguiente[x][y] = 0;
           pixels.setPixelColor(num_led (x, y), pixels.Color(0, 0, 0));
           Serial.print("Mueren la celda: ");
           Serial.print(x);
@@ -57,7 +61,7 @@ void loop() {
       }
       else {
         if ((circundantes == 3)) {
-          universo[x][y] = 1;
+          universo_siguiente[x][y] = 1;
           pixels.setPixelColor(num_led (x, y), pixels.Color(25, 0, 0));
           Serial.print("Nace la celda: ");
           Serial.print(x);
@@ -68,8 +72,10 @@ void loop() {
     }
   }
   pixels.show(); // This sends the updated pixel color to the hardware.
+  num_iteracion++;
   Serial.print("Iteracion: ");
   Serial.println(num_iteracion);
+  actualiza_universo();
   delay(delayval);
 }
 
@@ -89,18 +95,29 @@ int cacular_circundantes (int x, int y) {
 }
 
 void inicializa_universo() {  //inicializa el universo tal y como quieres que empiece
+  Serial.println("Inicializado");
   for (int x = 0; x < NUMMATRIZ_X; x++) {
     for (int y = 0; y < NUMMATRIZ_Y; y++) {
       if (x > 3) {
         universo[x][y] = 1;
+        universo_siguiente[x][y] = 1;
         pixels.setPixelColor(num_led (x, y), pixels.Color(25, 0, 0));
       }
       else {
         universo[x][y] = 0;
+        universo_siguiente[x][y] = 0;
         pixels.setPixelColor(num_led (x, y), pixels.Color(0, 0, 0));
       }
       pixels.show(); // This sends the updated pixel color to the hardware.
-      Serial.println("Inicializado");
     }
   }
 }
+
+void actualiza_universo() {
+  for (int x = 0; x < NUMMATRIZ_X; x++) {
+    for (int y = 0; y < NUMMATRIZ_Y; y++) {
+      universo[x][y] = universo_siguiente[x][y];
+    }
+  }
+}
+
